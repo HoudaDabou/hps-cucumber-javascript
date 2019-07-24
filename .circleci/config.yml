@@ -23,8 +23,8 @@ jobs:
             curl -sSL https://rvm.io/pkuczynski.asc | gpg --import -
             curl -sSL https://get.rvm.io | bash -s stable
             source /home/circleci/.rvm/scripts/rvm
-            rvm install ruby-2.2
-            rvm use 2.2
+            rvm install ruby-2.5.5
+            rvm use 2.5.5
       - run:
           name: Regenerate feature files with UIDs, which are included in this test run 
           command: |
