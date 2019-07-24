@@ -1,0 +1,41 @@
+# Javascript Node CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-javascript/ for more details
+#
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/node:8
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+      - run:
+          name: Install hiptest-publisher
+          command: |
+            rvm install 2.2
+            rvm use 2.2
+            gem install hiptest-publisher
+      - run:
+          name: Regenerate feature files with UIDs, which are included in this test run 
+          command: |
+            hiptest-publisher -c cucumber-js.conf --token=${SECRET_TOKEN} --only=features,step_definitions --test-run-id=283351
+      - run:
+          name: Build the tests to generate a json report file 
+          command: |
+            npm install
+            node_modules/.bin/cucumber-js --format=json > report.json
+      - run:
+          name: Push the json report file to Hiptest
+          command: |
+            hiptest-publisher -c cucumber-js.conf --push <path to your results file>report.json --test-run-id 283351 --push-format cucumber-json
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
