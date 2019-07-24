@@ -41,7 +41,7 @@ jobs:
           command: |
             source /home/circleci/.rvm/scripts/rvm
             gem install hiptest-publisher
-            hiptest-publisher -c cucumber-js.conf --push report.json --test-run-id 283351 --push-format cucumber-json
+            hiptest-publisher -c cucumber-js.conf --token=${SECRET_TOKEN} --push report.json --test-run-id 283351 --push-format cucumber-json
       - save_cache:
           paths:
             - node_modules
