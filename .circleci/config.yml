@@ -17,7 +17,7 @@ jobs:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
       - run:
-          name: Install hiptest-publisher
+          name: Install ruby for hiptest-publisher
           command: |
             # gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
             curl -sSL https://rvm.io/pkuczynski.asc | gpg --import -
@@ -25,10 +25,11 @@ jobs:
             source /home/circleci/.rvm/scripts/rvm
             rvm install ruby-2.2
             rvm use 2.2
-            gem install hiptest-publisher
       - run:
           name: Regenerate feature files with UIDs, which are included in this test run 
           command: |
+            source /home/circleci/.rvm/scripts/rvm
+            gem install hiptest-publisher
             hiptest-publisher -c cucumber-js.conf --token=${SECRET_TOKEN} --only=features,step_definitions --test-run-id=283351
       - run:
           name: Build the tests to generate a json report file 
