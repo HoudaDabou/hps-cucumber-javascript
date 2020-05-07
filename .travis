@@ -1,7 +1,5 @@
 language: generic
 
-sudo: false
-
 before_install:
   - rvm install 2.3
   - rvm use 2.3
