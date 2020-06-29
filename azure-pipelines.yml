@@ -25,7 +25,7 @@ steps:
 - script: |
     npm install
     npm run build
-    $(Pipeline.Workspace)/node_modules/.bin/cucumber-js --format=json >> $(Pipeline.Workspace)/results.json
+    node_modules/.bin/cucumber-js --format=json >> $(Pipeline.Workspace)/results.json
   displayName: 'npm install and build tests'
 - script: $(Pipeline.Workspace)/hiptest-publisher -c cucumber-js.conf --token=$(project_token) -p "$(Pipeline.Workspace)/results.json" --test-run-id=$(test_run_id)
   displayName: 'Push the test results file to HipTest'
