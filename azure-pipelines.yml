@@ -1,0 +1,31 @@
+# Node.js
+# Build a general Node.js project with npm.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '10.x'
+  displayName: 'Install Node.js'
+
+- script: |
+   echo "#! /bin/bash" > $(Pipeline.Workspace)/hiptest-publisher
+   echo "docker run --rm --volume=\"$(pwd):/app\" hiptest/hiptest-publisher  \"\$@\"" >> $(Pipeline.Workspace)/hiptest-publisher
+   sudo chmod +x $(Pipeline.Workspace)/hiptest-publisher
+  displayName: 'install hiptest-publisher though its docker image'
+- script: $(Pipeline.Workspace)/hiptest-publisher -c cucumber-js.conf --token=$(project_token) --test-run-id=$(test_run_id) --without=actionwords
+  displayName: 'Regenerate features and fetch UIDs in each scenario included in the test run'
+- script: |
+    npm install
+    npm run build
+    node_modules/.bin/cucumber-js --format=json >> $(Pipeline.Workspace)/results.json
+  displayName: 'npm install and build tests'
+- script: $(Pipeline.Workspace)/hiptest-publisher -c cucumber-js.conf --token=$(project_token) -p "$(Pipeline.Workspace)/results.json" --test-run-id=$(test_run_id)
+  displayName: 'Push the test results file to HipTest'
